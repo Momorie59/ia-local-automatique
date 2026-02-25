@@ -7,6 +7,8 @@
 **Installe en une seule commande une stack IA locale moderne et performante :**
 Ollama + Open WebUI + (éventuellement Docker)  
 → interface web élégante, modèles locaux, GPU accéléré (NVIDIA / AMD / Intel)
+
+
 /!\ La partie installation via Web n'est pas encore tout à fait operationel!! Merci de faire l'installation via le script!!!/!\
 
 ## ✨ Fonctionnalités principales
