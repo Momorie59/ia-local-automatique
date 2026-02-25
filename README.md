@@ -28,7 +28,7 @@ Ollama + Open WebUI + (éventuellement Docker)
 - Linux x86_64 ou arm64 (Raspberry Pi 5 / Orange Pi 5+ support partiel)
 - **Accès root** (sudo)
 - Connexion internet (au moins pour la première installation)
-- Espace disque recommandé : **≥ 100 Go** libres (modèles + cache)
+- Espace disque recommandé : 2 disques: 1 Systeme et 1 pour les modeles **≥ 100 Go** libres (modèles + cache)
 
 <img width="658" height="630" alt="image" src="https://github.com/user-attachments/assets/a26f29e2-f79e-499e-b480-8a3f7cdd5986" />
 
