@@ -5,7 +5,8 @@
 [![Current version](https://img.shields.io/badge/version-v8.0-orange)](https://github.com/Momorie59/ia-local-Automatique)
 
 **Installe en une seule commande une stack IA locale moderne et performante :**
-
+Ollama + Open WebUI + (éventuellement Docker)  
+→ interface web élégante, modèles locaux, GPU accéléré (NVIDIA / AMD / Intel)
 
 ## ✨ Fonctionnalités principales
 
@@ -29,16 +30,16 @@
 - Connexion internet (au moins pour la première installation)
 - Espace disque recommandé : **≥ 100 Go** libres (modèles + cache)
 
+<img width="658" height="630" alt="image" src="https://github.com/user-attachments/assets/a26f29e2-f79e-499e-b480-8a3f7cdd5986" />
+
+<img width="1656" height="741" alt="image" src="https://github.com/user-attachments/assets/65c61fa2-c378-4e8f-bcc0-d0a2d97727a9" />
+
+<img width="1673" height="536" alt="image" src="https://github.com/user-attachments/assets/122d288d-7fdf-406e-8e51-74d0d6977dcd" />
+
 ## Installation en 1 ligne
 
 ```bash
 # Méthode recommandée (la plus simple)
 sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/Momorie59/ia-local-automatique/main/install_ia_local_V8.sh)"
 
-<img width="658" height="630" alt="image" src="https://github.com/user-attachments/assets/a26f29e2-f79e-499e-b480-8a3f7cdd5986" />
 
-Ollama + Open WebUI + (éventuellement Docker)  
-→ interface web élégante, modèles locaux, GPU accéléré (NVIDIA / AMD / Intel)
-<img width="1656" height="741" alt="image" src="https://github.com/user-attachments/assets/65c61fa2-c378-4e8f-bcc0-d0a2d97727a9" />
-
-<img width="1673" height="536" alt="image" src="https://github.com/user-attachments/assets/122d288d-7fdf-406e-8e51-74d0d6977dcd" />
