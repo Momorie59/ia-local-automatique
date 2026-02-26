@@ -43,6 +43,6 @@ Ollama + Open WebUI + (éventuellement Docker)
 
 ```bash
 # Méthode recommandée (la plus simple)
-sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/Momorie59/ia-local-automatique/main/install_ia_local_V8.sh)"
+curl -fsSL https://raw.githubusercontent.com/Momorie59/ia-local-automatique/main/install_ia_local_V8.sh -o install_ia_local_V8.sh
 
 
