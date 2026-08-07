@@ -1,48 +1,146 @@
-# IA Local Installer v8 – Installation intelligente d'une IA locale complète
+<div align="center">
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Tested on](https://img.shields.io/badge/Tested%20on-Ubuntu%20%7C%20Pop!_OS%20%7C%20Fedora%20%7C%20Arch%20%7C%20Debian-brightgreen)](https://github.com/Momorie59/ia-local-automatique)
-[![Current version](https://img.shields.io/badge/version-v8.0-orange)](https://github.com/Momorie59/ia-local-Automatique)
+# 🧠 Momory · IA Local
 
-**Installe en une seule commande une stack IA locale moderne et performante :**
-Ollama + Open WebUI + (éventuellement Docker)  
-→ interface web élégante, modèles locaux, GPU accéléré (NVIDIA / AMD / Intel)
+**Ton infrastructure IA locale, entièrement privée, avec son propre assistant CLI.**
 
+Installe un serveur IA complet (Ollama, Open WebUI, Qdrant, dashboard web) sur ta machine,
+puis pilote-le depuis n'importe où avec **Momory CLI** — ton équivalent local de
+Gemini CLI / Claude Code, connecté à ton serveur, pas à un cloud.
 
-/!\ La partie installation via Web n'est pas encore tout à fait operationel!! Merci de faire l'installation via le script!!!/!\
+[![Bash](https://img.shields.io/badge/bash-5.x-4EAA25?logo=gnubash&logoColor=white)](.)
+[![Python](https://img.shields.io/badge/python-3-3776AB?logo=python&logoColor=white)](.)
+[![TypeScript](https://img.shields.io/badge/node-%3E%3D18-339933?logo=nodedotjs&logoColor=white)](.)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.md)
 
-## ✨ Fonctionnalités principales
+</div>
 
-- **Détection automatique** du matériel (GPU NVIDIA/AMD/Intel, RAM, VRAM)
-- **Choix intelligent** du backend et des pilotes en fonction de la config
-- **Installation multi-distro** : Ubuntu, Pop!_OS, Debian, Fedora, Arch, openSUSE, Void, Alpine…
-- **Interface web complète** (port 7842) avec :
-  - progression en direct
-  - stats CPU/GPU/RAM/disque
-  - gestion des modèles
-  - administration (changement mot de passe, redémarrages…)
-- **Reprise après reboot / erreur** grâce à systemd
-- **Réparation rapide** d’Open WebUI en cas de perte de données après mise à jour
-- **Sauvegardes automatiques** avant mises à jour majeures
-- **Mode dry-run** pour tester sans rien casser
+---
 
-## Prérequis
+## ✨ Ce que tu obtiens
 
-- Linux x86_64 ou arm64 (Raspberry Pi 5 / Orange Pi 5+ support partiel)
-- **Accès root** (sudo)
-- Connexion internet (au moins pour la première installation)
-- Espace disque recommandé : 2 disques: 1 Systeme et 1 pour les modeles **≥ 100 Go** libres (modèles + cache)
+| | |
+|---|---|
+| 🖥️ **Installeur intelligent** | Détecte ton matériel (CPU/GPU/RAM/disques), choisit le meilleur backend, construit un plan d'installation sur mesure |
+| 🦙 **Ollama + Open WebUI** | Moteur d'inférence local + interface de chat web, GPU NVIDIA/AMD ou CPU fallback |
+| 🧩 **Qdrant** | Base vectorielle en option, pour la mémoire longue durée / RAG |
+| 📊 **Dashboard web** | Stats temps réel (CPU/RAM/GPU/réseau), gestion des modèles, logs, installation pilotable depuis le navigateur — **annulable en un clic** |
+| 📝 **Notes intégrées** | Bloc-notes du dashboard avec corbeille (suppression récupérable, vidage explicite) |
+| 🤖 **Momory CLI** | Assistant IA en ligne de commande — discute, lit/écrit/supprime/télécharge des fichiers dans ton projet, avec confirmation systématique |
+| 🔁 **Reprise automatique** | Coupure de courant, reboot, erreur réseau — l'installation reprend là où elle s'est arrêtée |
 
-<img width="658" height="630" alt="image" src="https://github.com/user-attachments/assets/a26f29e2-f79e-499e-b480-8a3f7cdd5986" />
+---
 
-<img width="1656" height="741" alt="image" src="https://github.com/user-attachments/assets/65c61fa2-c378-4e8f-bcc0-d0a2d97727a9" />
-
-<img width="1673" height="536" alt="image" src="https://github.com/user-attachments/assets/122d288d-7fdf-406e-8e51-74d0d6977dcd" />
-
-## Installation en 1 ligne
+## 🚀 Installation du serveur
 
 ```bash
-# Méthode recommandée (la plus simple)
-curl -fsSL https://raw.githubusercontent.com/Momorie59/ia-local-automatique/main/install_ia_local_V8.sh -o install_ia_local_V8.sh
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique
+sudo bash Momory-ia_local_v9.sh
+```
 
+Le script analyse ta machine, te propose un plan d'installation, et te guide pas à pas
+(confirmation avant chaque action sensible — jamais d'accès système silencieux).
 
+Une fois terminé, le dashboard est accessible sur `http://<IP-du-serveur>:7842`.
+
+## 💻 Installation de Momory CLI (sur ta machine de tous les jours)
+
+Directement depuis le dashboard web (onglet **Accès & Notes**) — bouton de téléchargement
++ commande prête à copier, adaptée à ton OS.
+
+Ou en ligne de commande :
+
+```bash
+# Linux / Mac
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique/momory-cli
+npm install && npm run build && npm link
+```
+
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique/momory-cli
+npm install; npm run build; npm link
+```
+
+Puis connecte-le à ton serveur — la config se récupère automatiquement, rien à taper à la main :
+
+```bash
+momory config --auto 192.168.1.16
+momory
+```
+
+---
+
+## 🧠 Momory CLI — usage
+
+```
+momory
+```
+
+Une seule commande pour tout : discussion normale **et** actions sur tes fichiers, selon
+ce que tu demandes — pas besoin de choisir un mode.
+
+```
+› crée un fichier hello.sh qui affiche "hello world"
+
+  🔧 outil détecté : write_file
+
+📝 Momory propose de créer : ./hello.sh
++ #!/bin/bash
++ echo "hello world"
+  >>> Appliquer cette création ? [oui/NON] :
+```
+
+- **Lecture, création, modification, suppression, téléchargement** de fichiers — toujours
+  avec diff affiché et confirmation (ou auto-approbation activable une fois par session)
+- **Réflexion visible** automatique si le modèle la supporte
+- **Détection de dérive** : si la config du serveur change (nouveau modèle, Qdrant installé...),
+  Momory te prévient au démarrage avec la commande exacte pour te resynchroniser
+- Protection anti-évasion : impossible de toucher un fichier hors du dossier courant
+
+Autres commandes : `momory doctor` (diagnostic), `momory models` (modèles disponibles),
+`momory config --setup` (configuration manuelle).
+
+---
+
+## 📂 Structure du projet
+
+```
+Momory-ia_local_v9.sh    Point d'entrée — orchestration, reprise après erreur/reboot
+config/defaults.conf     Constantes centralisées (ports, chemins d'état, TTL...)
+lib/                     Modules bash (un fichier = une responsabilité)
+  ├─ common.sh             Logging, privilèges, configuration
+  ├─ os_detect.sh           Détection distro + abstraction paquets/services
+  ├─ hardware_analysis.sh   Analyse GPU/RAM/VRAM/disques
+  ├─ execute_plan.sh        Exécution des étapes d'installation
+  ├─ dashboard.sh           Déploiement du dashboard web + service systemd
+  └─ ...
+web/                     Dashboard web
+  ├─ dashboard_server.py   Serveur HTTP (Python stdlib, zéro dépendance)
+  └─ static/                HTML/CSS/JS
+momory-cli/              Assistant IA en ligne de commande (TypeScript/Node)
+```
+
+## 🖥️ Distributions supportées
+
+Ubuntu · Pop!_OS · Debian · Fedora · Arch · openSUSE · Void · Alpine — toute distro
+Linux x86_64/arm64. GPU NVIDIA (CUDA), AMD (ROCm), ou CPU.
+
+## 🔒 Sécurité
+
+Aucun accès système sans confirmation explicite. Chaque action sensible (installation,
+modification de fichier, suppression) est affichée avant d'être appliquée — en terminal
+et dans le dashboard web, où tu peux valider Oui/Non à distance.
+
+## 📜 Licence
+
+Voir [LICENSE.md](LICENSE.md).
+
+---
+
+<div align="center">
+<sub>Développé pour tourner entièrement en local — aucune donnée n'envoie vers un cloud tiers.</sub>
+</div>
