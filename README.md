@@ -1,107 +1,146 @@
-# ia-local-automatique — V9 (réécriture complète)
+<div align="center">
 
-## Comment démarrer
+# 🧠 Momory · IA Local
 
-```bash
-sudo bash install_ia_local_V9.sh
-```
+**Ton infrastructure IA locale, entièrement privée, avec son propre assistant CLI.**
 
-Au premier lancement (ou via `configure_infra` lors d'une réinstallation),
-le script te demande explicitement quel disque/point de montage utiliser
-pour les données — **aucun chemin n'est codé en dur**, contrairement à la
-V8 qui avait `/mnt/ia_toshiba` en dur à plusieurs endroits.
+Installe un serveur IA complet (Ollama, Open WebUI, Qdrant, dashboard web) sur ta machine,
+puis pilote-le depuis n'importe où avec **Momory CLI** — ton équivalent local de
+Gemini CLI / Claude Code, connecté à ton serveur, pas à un cloud.
 
-## Ce qui a changé par rapport à la V8
+[![Bash](https://img.shields.io/badge/bash-5.x-4EAA25?logo=gnubash&logoColor=white)](.)
+[![Python](https://img.shields.io/badge/python-3-3776AB?logo=python&logoColor=white)](.)
+[![TypeScript](https://img.shields.io/badge/node-%3E%3D18-339933?logo=nodedotjs&logoColor=white)](.)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.md)
 
-### Structure
-Le fichier unique de 7743 lignes est éclaté en modules à responsabilité
-unique (`lib/*.sh`), plus un dossier `web/` pour le dashboard (HTML/CSS/JS
-séparés au lieu d'un heredoc bash→Python→HTML→CSS→JS imbriqué).
+</div>
 
-### Bugs réels trouvés et corrigés (présents dans la V8 d'origine)
-1. **`lib/dashboard.sh`** : le JSON de progression utilisait
-   `printf '"%%s",'` (double `%`) au lieu de `printf '"%s",'` — le champ
-   `plan` affiché dans le dashboard contenait littéralement le texte
-   `%s` répété au lieu du nom des étapes.
-2. **`web/dashboard_server.py`** : le parseur de config Python lisait
-   `config.env` comme du `clé=valeur` plat, alors que le bash y écrit du
-   `CFG[clé]=valeur` (tableau bash sérialisé). Résultat : `cfg.get("webui_dir")`
-   ne matchait jamais et retombait toujours sur une valeur par défaut,
-   quelle que soit ta config réelle.
-3. Deux `cd` sans gestion d'échec dans `lib/execute_plan.sh` (compilation
-   llama.cpp) — un `cd` silencieusement échoué aurait pu faire compiler/
-   installer des fichiers au mauvais endroit.
-4. Plusieurs `local var="$(commande)"` qui masquaient le code de retour de
-   la commande (`local` réussit toujours, donc un échec de la commande
-   passait inaperçu) — corrigés en déclarant puis assignant séparément.
+---
 
-### Nettoyage structurel
-- Suppression du chemin de données codé en dur (`/mnt/ia_toshiba`) — le
-  point de montage est maintenant toujours demandé via `configure_infra()`
-  (`lib/interactive_config.sh`), qui existait déjà en V8 et fait déjà ça
-  bien : elle liste les disques et **propose** un point de montage calculé
-  à partir du disque choisi, sans jamais imposer de valeur figée.
-- `config/defaults.conf` centralise les constantes (port du dashboard,
-  TTL de session, rate limiting, identifiants par défaut, chemins d'état/logs).
-- Résolution d'une collision de noms : deux fonctions `load_config`
-  existaient (une pour charger les réglages fixes, une pour restaurer
-  l'état complet d'une installation interrompue) et l'une écrasait
-  silencieusement l'autre. Renommé la première en `load_settings`.
-- Toutes les anciennes variables (`STATE_DIR`, `LOG_DIR`, `CONFIG_FILE`,
-  `CREDS_FILE`, `PROGRESS_FILE`, `STATE_FILE`) sont désormais nommées
-  `IA_STATE_DIR`, `IA_LOG_DIR`, etc. de façon cohérente dans tout le projet.
-- Vérifié avec `shellcheck` (sévérité *error* : 0 problème) sur l'ensemble
-  du projet.
+## ✨ Ce que tu obtiens
 
-### Structure des fichiers
-
-| Fichier | Rôle |
+| | |
 |---|---|
-| `install_ia_local_V9.sh` | Point d'entrée : charge les modules, gère la reprise après reboot/erreur |
-| `config/defaults.conf` | Toutes les constantes (chemins d'état, port dashboard, TTL, etc.) |
-| `lib/common.sh` | Logging, couleurs, privilèges, chargement des réglages |
-| `lib/os_detect.sh` | Détection distro + abstraction paquets/services |
-| `lib/gpu_drivers.sh` | Drivers NVIDIA/ROCm, Docker, Ollama sécurisé, Container Toolkit |
-| `lib/dashboard.sh` | Déploiement de `web/` + service systemd du dashboard |
-| `lib/hud.sh` | Panneau HUD terminal (stats temps réel) |
-| `lib/state.sh` | Reprise après reboot/erreur (save_state/load_state/save_config) |
-| `lib/hardware_analysis.sh` | Analyse GPU/RAM/VRAM/disques |
-| `lib/backend_choice.sh` | Choix du backend d'inférence |
-| `lib/plan.sh` | Construction du plan d'installation |
-| `lib/models_catalog.sh` | Catalogue et sélection des modèles |
-| `lib/execute_plan.sh` | Exécution des étapes du plan |
-| `lib/interactive_config.sh` | `configure_infra()` — demande disque/points de montage/ports |
-| `lib/full_install.sh` | Orchestration de l'installation complète |
-| `lib/menus.sh` | Menus secondaires |
-| `lib/update.sh` | Vérification et application des mises à jour |
-| `lib/cleanup.sh` | Nettoyage complet / réinstallation |
-| `lib/repair_webui.sh` | Réparation rapide Open WebUI |
-| `web/dashboard_server.py` | Serveur HTTP (stdlib, zéro dépendance) |
-| `web/static/{index.html,style.css,app.js}` | Interface du dashboard |
+| 🖥️ **Installeur intelligent** | Détecte ton matériel (CPU/GPU/RAM/disques), choisit le meilleur backend, construit un plan d'installation sur mesure |
+| 🦙 **Ollama + Open WebUI** | Moteur d'inférence local + interface de chat web, GPU NVIDIA/AMD ou CPU fallback |
+| 🧩 **Qdrant** | Base vectorielle en option, pour la mémoire longue durée / RAG |
+| 📊 **Dashboard web** | Stats temps réel (CPU/RAM/GPU/réseau), gestion des modèles, logs, installation pilotable depuis le navigateur — **annulable en un clic** |
+| 📝 **Notes intégrées** | Bloc-notes du dashboard avec corbeille (suppression récupérable, vidage explicite) |
+| 🤖 **Momory CLI** | Assistant IA en ligne de commande — discute, lit/écrit/supprime/télécharge des fichiers dans ton projet, avec confirmation systématique |
+| 🔁 **Reprise automatique** | Coupure de courant, reboot, erreur réseau — l'installation reprend là où elle s'est arrêtée |
 
-## Limites connues (non bloquantes)
+---
 
-- Le style de nommage des variables locales (majuscules `$VAR` au lieu de
-  minuscules) vient de la V8 et n'a pas été uniformisé partout — cosmétique,
-  sans impact fonctionnel.
-- `shellcheck -S warning` remonte encore des faux positifs (`SC2034`,
-  `SC2154`) sur les tableaux associatifs `HW`/`CFG` partagés entre fichiers
-  — normal pour un projet multi-fichiers, shellcheck ne corrèle pas les
-  définitions entre modules sourcés séparément.
-- Les autres services systemd (`ollama.service`, `open-webui.service`,
-  `ia-installer-resume.service`) restent en toutes lettres dans le code au
-  lieu d'utiliser les variables `OLLAMA_SERVICE`/`OPEN_WEBUI_SERVICE`/
-  `RESUME_SERVICE` ajoutées à `config/defaults.conf` — centralisation
-  possible plus tard si tu veux, mais zéro impact fonctionnel aujourd'hui.
+## 🚀 Installation du serveur
 
-## Test recommandé avant usage réel
-
-Comme pour toute réécriture, teste sur une VM jetable avant de lancer sur
-ta machine de production :
 ```bash
-sudo bash install_ia_local_V9.sh
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique
+sudo bash Momory-ia_local_v9.sh
 ```
-Compare le comportement à ta V8 (menus, détection matériel, dashboard sur
-le port 7842) — la logique métier n'a volontairement pas été réinventée,
-seulement réorganisée et débuggée, donc le comportement doit être identique
-à la V8 en mieux (bugs corrigés ci-dessus).
+
+Le script analyse ta machine, te propose un plan d'installation, et te guide pas à pas
+(confirmation avant chaque action sensible — jamais d'accès système silencieux).
+
+Une fois terminé, le dashboard est accessible sur `http://<IP-du-serveur>:7842`.
+
+## 💻 Installation de Momory CLI (sur ta machine de tous les jours)
+
+Directement depuis le dashboard web (onglet **Accès & Notes**) — bouton de téléchargement
++ commande prête à copier, adaptée à ton OS.
+
+Ou en ligne de commande :
+
+```bash
+# Linux / Mac
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique/momory-cli
+npm install && npm run build && npm link
+```
+
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique/momory-cli
+npm install; npm run build; npm link
+```
+
+Puis connecte-le à ton serveur — la config se récupère automatiquement, rien à taper à la main :
+
+```bash
+momory config --auto 192.168.1.16
+momory
+```
+
+---
+
+## 🧠 Momory CLI — usage
+
+```
+momory
+```
+
+Une seule commande pour tout : discussion normale **et** actions sur tes fichiers, selon
+ce que tu demandes — pas besoin de choisir un mode.
+
+```
+› crée un fichier hello.sh qui affiche "hello world"
+
+  🔧 outil détecté : write_file
+
+📝 Momory propose de créer : ./hello.sh
++ #!/bin/bash
++ echo "hello world"
+  >>> Appliquer cette création ? [oui/NON] :
+```
+
+- **Lecture, création, modification, suppression, téléchargement** de fichiers — toujours
+  avec diff affiché et confirmation (ou auto-approbation activable une fois par session)
+- **Réflexion visible** automatique si le modèle la supporte
+- **Détection de dérive** : si la config du serveur change (nouveau modèle, Qdrant installé...),
+  Momory te prévient au démarrage avec la commande exacte pour te resynchroniser
+- Protection anti-évasion : impossible de toucher un fichier hors du dossier courant
+
+Autres commandes : `momory doctor` (diagnostic), `momory models` (modèles disponibles),
+`momory config --setup` (configuration manuelle).
+
+---
+
+## 📂 Structure du projet
+
+```
+Momory-ia_local_v9.sh    Point d'entrée — orchestration, reprise après erreur/reboot
+config/defaults.conf     Constantes centralisées (ports, chemins d'état, TTL...)
+lib/                     Modules bash (un fichier = une responsabilité)
+  ├─ common.sh             Logging, privilèges, configuration
+  ├─ os_detect.sh           Détection distro + abstraction paquets/services
+  ├─ hardware_analysis.sh   Analyse GPU/RAM/VRAM/disques
+  ├─ execute_plan.sh        Exécution des étapes d'installation
+  ├─ dashboard.sh           Déploiement du dashboard web + service systemd
+  └─ ...
+web/                     Dashboard web
+  ├─ dashboard_server.py   Serveur HTTP (Python stdlib, zéro dépendance)
+  └─ static/                HTML/CSS/JS
+momory-cli/              Assistant IA en ligne de commande (TypeScript/Node)
+```
+
+## 🖥️ Distributions supportées
+
+Ubuntu · Pop!_OS · Debian · Fedora · Arch · openSUSE · Void · Alpine — toute distro
+Linux x86_64/arm64. GPU NVIDIA (CUDA), AMD (ROCm), ou CPU.
+
+## 🔒 Sécurité
+
+Aucun accès système sans confirmation explicite. Chaque action sensible (installation,
+modification de fichier, suppression) est affichée avant d'être appliquée — en terminal
+et dans le dashboard web, où tu peux valider Oui/Non à distance.
+
+## 📜 Licence
+
+Voir [LICENSE.md](LICENSE.md).
+
+---
+
+<div align="center">
+<sub>Développé pour tourner entièrement en local — aucune donnée n'envoie vers un cloud tiers.</sub>
+</div>
