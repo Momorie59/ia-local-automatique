@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Momory · IA Local — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+
+<nav>
+  <div class="nav-l">
+    <svg class="brand-mark" viewBox="0 0 32 32" width="30" height="30">
+      <circle cx="16" cy="16" r="6" fill="none" stroke="var(--neon)" stroke-width="1.6"/>
+      <circle cx="16" cy="16" r="2.4" fill="var(--neon)"/>
+      <circle class="bm-orbit1" cx="16" cy="4" r="1.8" fill="var(--blue)"/>
+      <circle class="bm-orbit2" cx="27.4" cy="22" r="1.8" fill="var(--purple)"/>
+      <circle class="bm-orbit3" cx="4.6" cy="22" r="1.8" fill="var(--yellow)"/>
+    </svg>
+    <div class="brand-text">
+      <div class="brand">Momory</div>
+      <div class="brand-sub">IA LOCAL · COMMAND CENTER</div>
+    </div>
+    <div class="nav-chips">
+      <span class="chip live"><span class="pulse" id="lp"></span>LIVE</span>
+      <span class="chip" id="ch">—</span>
+      <span class="chip" id="cu">—</span>
+    </div>
+  </div>
+  <div class="nav-r">
+    <div id="ntime" style="font-family:var(--mono);font-size:12px;color:var(--muted)">—</div>
+  </div>
+</nav>
+
+<!-- ═══ BANNIÈRE INSTALLATION EN COURS ═══ -->
+<div id="install-banner">
+  <div class="ib-top">
+    <div class="ib-pulse"></div>
+    <div class="ib-title">⚙️ Installation en cours…</div>
+    <div class="ib-step" id="ib-step">Étape — / —</div>
+  </div>
+  <div class="ib-body">
+    <div class="ib-bar-wrap"><div class="ib-bar" id="ib-bar"></div></div>
+    <div class="ib-info">
+      <div class="ib-label" id="ib-label">Initialisation…</div>
+      <div class="ib-pct"><span id="ib-pct">0</span>%</div>
+    </div>
+    <div class="ib-steps" id="ib-dots"></div>
+  </div>
+</div>
+
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab-stats" onclick="switchTab('stats')">
+    <span class="tic">📊</span> Statistiques
+  </div>
+  <div class="tab" id="tab-hub" onclick="switchTab('hub')">
+    <span class="tic">🚀</span> Accès &amp; Notes
+  </div>
+  <div class="tab" id="tab-power" onclick="switchTab('power')">
+    <span class="tic">⚡</span> Énergie
+  </div>
+  <div class="tab" id="tab-admin" onclick="switchTab('admin')">
+    <span class="tic">⚙️</span> Administration
+    <span class="tab-lock" id="tab-lock">🔒</span>
+  </div>
+</div>
+
+<!-- ═══ STATS PANEL ═══ -->
+<div class="panel active" id="p-stats">
+<main>
+<div id="rt">
+  <div class="ms"><div class="mi" style="background:rgba(0,255,179,.08)">🖥️</div><div><div class="ml">CPU</div><div class="mv"><span id="mt-cpu">—</span><span style="font-size:13px;color:var(--muted)">%</span></div><div class="msb" id="mt-cpu-s">—</div></div></div>
+  <div class="ms"><div class="mi" style="background:rgba(77,159,255,.08)">💾</div><div><div class="ml">RAM</div><div class="mv" id="mt-ram">—</div><div class="msb" id="mt-ram-s">—</div></div></div>
+  <div class="ms"><div class="mi" style="background:rgba(168,85,247,.08)">⚡</div><div><div class="ml">GPU</div><div class="mv" id="mt-gpu">—</div><div class="msb" id="mt-gpu-s">—</div></div></div>
+  <div class="ms"><div class="mi" style="background:rgba(249,115,22,.08)">🌐</div><div><div class="ml">Réseau</div><div class="mv" id="mt-net">—</div><div class="msb" id="mt-net-s">—</div></div></div>
+</div>
+<div class="card" id="cc">
+  <div class="ch"><div class="ct"><span>🖥️</span>PROCESSEUR</div><span id="cb" class="badge bok">OK</span></div>
+  <div class="gw">
+    <svg class="gsvg" width="100" height="100" viewBox="0 0 110 110">
+      <circle class="gtrack" cx="55" cy="55" r="42" stroke-dasharray="226" stroke-dashoffset="56"/>
+      <circle class="gfill" cx="55" cy="55" r="42" id="cg-g" stroke="var(--neon)" stroke-dasharray="226" stroke-dashoffset="226" transform="rotate(-210 55 55)"/>
+      <text class="gpc" x="55" y="51" id="cg-p">0%</text><text class="gu" x="55" y="65">CPU</text>
+    </svg>
+    <div class="gi"><div class="gbig" id="cf">—<span> MHz</span></div><div class="gsub" id="ct2">—</div><div class="gsub" style="margin-top:5px;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px" id="cm2">—</div></div>
+  </div>
+  <div class="sw"><svg id="spc" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="gn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00ffb3" stop-opacity=".5"/><stop offset="100%" stop-color="#00ffb3" stop-opacity="0"/></linearGradient></defs><path class="sa" fill="url(#gn)" id="spc-a" d=""/><path class="sl" stroke="var(--neon)" id="spc-l" d=""/></svg></div>
+  <div class="cg2" id="cores"></div>
+</div>
+<div class="card" id="cm">
+  <div class="ch"><div class="ct"><span>💾</span>MÉMOIRE</div><span id="rb" class="badge bok">OK</span></div>
+  <div class="gw">
+    <svg class="gsvg" width="100" height="100" viewBox="0 0 110 110">
+      <circle class="gtrack" cx="55" cy="55" r="42" stroke-dasharray="226" stroke-dashoffset="56"/>
+      <circle class="gfill" cx="55" cy="55" r="42" id="rg-g" stroke="var(--blue)" stroke-dasharray="226" stroke-dashoffset="226" transform="rotate(-210 55 55)"/>
+      <text class="gpc" x="55" y="51" id="rg-p">0%</text><text class="gu" x="55" y="65">RAM</text>
+    </svg>
+    <div class="gi"><div class="gbig" id="ru">—<span> Mo</span></div><div class="gsub" id="rt2">—</div></div>
+  </div>
+  <div class="bg"><div class="br_"><span>RAM</span><span id="rpl">—%</span></div><div class="bt"><div class="bf fb" id="rb_" style="width:0%"></div></div></div>
+  <div class="bg"><div class="br_"><span>Swap</span><span id="spl">—%</span></div><div class="bt"><div class="bf fp" id="sb_" style="width:0%"></div></div></div>
+  <div class="sw"><svg id="spr" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4d9fff" stop-opacity=".5"/><stop offset="100%" stop-color="#4d9fff" stop-opacity="0"/></linearGradient></defs><path class="sa" fill="url(#gb)" id="spr-a" d=""/><path class="sl" stroke="var(--blue)" id="spr-l" d=""/></svg></div>
+</div>
+<div class="card" id="cg"><div class="ch"><div class="ct"><span>⚡</span>GPU</div><span id="gpb" class="badge bwn">—</span></div><div id="gpd"><div style="color:var(--muted);font-size:12px;padding:16px 0">Détection...</div></div></div>
+<div class="card" id="cs">
+  <div class="ch"><div class="ct"><span>🔧</span>SERVICES</div></div>
+  <div class="sl2">
+    <div class="sr"><div class="sd" id="do"></div><div class="sb"><div class="sn">Ollama</div><div class="sm" id="mo">—</div><div class="mp" id="mw"></div></div><a class="slink" id="lo" href="#" target="_blank">API ↗</a></div>
+    <div class="sr"><div class="sd" id="dw"></div><div class="sb"><div class="sn">Open WebUI</div><div class="sm" id="mw2">—</div></div><a class="slink" id="lw" href="#" target="_blank">↗</a></div>
+    <div class="sr"><div class="sd" id="dd"></div><div class="sb"><div class="sn">Docker</div><div class="sm" id="md">—</div></div></div>
+  </div>
+</div>
+<div class="card" id="cn">
+  <div class="ch"><div class="ct"><span>🌐</span>RÉSEAU</div></div>
+  <div class="ni2"><div>Iface <span id="ni">—</span></div><div>IP <span id="nip">—</span></div></div>
+  <div class="nt">
+    <div class="nb"><div class="nd">↓ Réception</div><div><span class="nv" id="nrx">—</span><span class="nu" id="nrxu">Ko/s</span></div><div class="ntot" id="nrxt">—</div></div>
+    <div class="nb"><div class="nd">↑ Émission</div><div><span class="nv" id="ntx">—</span><span class="nu" id="ntxu">Ko/s</span></div><div class="ntot" id="ntxt">—</div></div>
+  </div>
+  <div class="sw"><svg id="spn" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="go" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f97316" stop-opacity=".4"/><stop offset="100%" stop-color="#f97316" stop-opacity="0"/></linearGradient></defs><path class="sa" fill="url(#go)" id="spn-a" d=""/><path class="sl" stroke="var(--orange)" id="spn-l" d=""/><path class="sl" stroke="var(--yellow)" stroke-dasharray="4,3" id="spn-t" d=""/></svg></div>
+</div>
+<div class="card" id="cd"><div class="ch"><div class="ct"><span>💿</span>STOCKAGE</div></div><div class="dl" id="dl2"></div></div>
+</main>
+</div><!-- /#p-stats -->
+
+<!-- ═══ HUB — ACCÈS RAPIDE / NOTES / DEV TOOLS ═══ -->
+<div class="panel" id="p-hub">
+<main>
+
+  <div class="ct" style="margin-bottom:12px">🚀 ACCÈS RAPIDE</div>
+  <div class="hub-grid" id="hub-links">
+    <!-- Rempli par renderHubLinks() -->
+  </div>
+
+  <div class="card notes-card">
+    <div class="ch">
+      <div class="ct"><span>📝</span>NOTES</div>
+      <button class="btn-s" id="trash-toggle" onclick="toggleTrash()">🗑 Corbeille <span id="trash-count">(0)</span></button>
+    </div>
+
+    <div class="note-add-row">
+      <input id="note-new-input" type="text" placeholder="Nouvelle note… (mot de passe, commande, idée)" maxlength="5000">
+      <button class="btn-s btn-go" onclick="addNote()">+ Ajouter</button>
+    </div>
+
+    <div id="notes-list" class="notes-list">
+      <!-- Rempli par renderNotes() -->
+    </div>
+
+    <div id="trash-panel" class="trash-panel" style="display:none">
+      <div class="trash-header">
+        <span>Notes supprimées — restaurables tant que la corbeille n'est pas vidée</span>
+        <button class="btn-s btn-stop" onclick="emptyTrash()">Vider la corbeille</button>
+      </div>
+      <div id="trash-list" class="notes-list"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ch"><div class="ct"><span>🧠</span>CONNECTER MOMORY CLI</div></div>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:4px">
+      Télécharge <b style="color:#fff">momory-cli</b> directement depuis ce serveur, sur
+      n'importe quelle machine (Windows, Mac, Linux) — pas besoin d'aller le chercher ailleurs.
+    </p>
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <a id="momory-download-link" href="/download/momory-cli.zip" class="btn-s btn-go" style="text-decoration:none;display:inline-flex;align-items:center">⬇ Télécharger momory-cli.zip</a>
+    </div>
+    <div class="lc-meta" style="margin-bottom:6px">
+      Sur la machine cliente — <b style="color:#fff">modifiable directement ici</b> avant de copier :
+    </div>
+
+    <div class="lc-meta" style="margin-top:8px">🪟 Windows — PowerShell <span style="color:var(--muted2)">(invite bleue "PS C:\...")</span></div>
+    <div class="snippet-box">
+      <code id="momory-cmd-ps" contenteditable="true" spellcheck="false">Invoke-WebRequest http://—:7842/download/momory-cli.zip -OutFile momory-cli.zip; Expand-Archive momory-cli.zip -Force; cd momory-cli; npm install; npm run build; npm link</code>
+      <button class="btn-s" onclick="copySnippet('momory-cmd-ps')">📋 Copier</button>
+    </div>
+
+    <div class="lc-meta" style="margin-top:8px">⬛ Windows — Invite de commandes (CMD) <span style="color:var(--muted2)">(invite noire "C:\...")</span></div>
+    <div class="snippet-box">
+      <code id="momory-cmd-cmd" contenteditable="true" spellcheck="false">curl -o momory-cli.zip http://—:7842/download/momory-cli.zip && tar -xf momory-cli.zip && cd momory-cli && npm install && npm run build && npm link</code>
+      <button class="btn-s" onclick="copySnippet('momory-cmd-cmd')">📋 Copier</button>
+    </div>
+
+    <div class="lc-meta" style="margin-top:8px">🐧 Mac / Linux</div>
+    <div class="snippet-box">
+      <code id="momory-cmd-nix" contenteditable="true" spellcheck="false">curl -O http://—:7842/download/momory-cli.zip && unzip momory-cli.zip && cd momory-cli && npm install && npm run build && npm link</code>
+      <button class="btn-s" onclick="copySnippet('momory-cmd-nix')">📋 Copier</button>
+    </div>
+
+    <div class="lc-meta" style="margin-top:8px">⚙️ Config Momory (à coller dans ~/.momory/config.yaml)</div>
+    <div class="snippet-box">
+      <code id="momory-config-snippet" contenteditable="true" spellcheck="false">host: — · port: 11434</code>
+      <button class="btn-s" onclick="copyMomoryConfig()">📋 Copier</button>
+    </div>
+    <div class="lc-meta" id="momory-models-hint">Modèle chat / coder : —</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ch"><div class="ct"><span>🤖</span>CONNECTER UN ÉDITEUR (ANDROID STUDIO / INTELLIJ)</div></div>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:4px">
+      Ollama expose une API compatible OpenAI. N'importe quel plugin IA d'Android Studio /
+      IntelliJ qui accepte une URL d'API personnalisée (ex: <b style="color:#fff">Continue</b>,
+      <b style="color:#fff">CodeGPT</b>, <b style="color:#fff">Tabby</b>) peut s'y connecter —
+      ton code ne quitte jamais ta machine.
+    </p>
+    <ol class="dev-steps">
+      <li>Installe le plugin de ton choix depuis le Marketplace d'Android Studio (<span style="color:var(--muted)">Settings → Plugins</span>)</li>
+      <li>Dans les réglages du plugin, choisis un provider <b style="color:#fff">OpenAI-compatible</b> / <b style="color:#fff">Ollama</b></li>
+      <li>Colle l'URL de l'API ci-dessous comme endpoint</li>
+      <li>Choisis un modèle installé (visible dans l'onglet Administration → Modèles)</li>
+    </ol>
+    <div class="snippet-box">
+      <code id="dev-api-url">http://—:11434</code>
+      <button class="btn-s" onclick="copySnippet('dev-api-url')">📋 Copier</button>
+    </div>
+    <div class="lc-meta" id="dev-models-hint">Modèles disponibles : —</div>
+  </div>
+
+</main>
+</div><!-- /#p-hub -->
+
+<!-- ═══ ÉNERGIE ═══ -->
+<div class="panel" id="p-power">
+<main>
+
+  <div id="pw-error-box" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+    color:var(--red);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;font-family:var(--mono)"></div>
+
+  <div class="hub-grid" style="margin-bottom:16px">
+    <div class="link-card">
+      <div class="lc-top"><div class="lc-name"><span class="lc-icon">⚡</span>Instantané</div></div>
+      <div id="pw-total" style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--yellow)">— W</div>
+      <div class="lc-meta" id="pw-cost-now">≈ —/jour · —/mois</div>
+    </div>
+    <div class="link-card">
+      <div class="lc-top"><div class="lc-name"><span class="lc-icon">🖥️</span>CPU</div></div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--blue)" id="pw-cpu">— W</div>
+      <div class="lc-meta" id="pw-cpu-src">—</div>
+    </div>
+    <div class="link-card">
+      <div class="lc-top"><div class="lc-name"><span class="lc-icon">🎮</span>GPU</div></div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--purple)" id="pw-gpu">— W</div>
+      <div class="lc-meta" id="pw-gpu-src">—</div>
+    </div>
+    <div class="link-card">
+      <div class="lc-top"><div class="lc-name"><span class="lc-icon">💿</span>Disques + RAM + base</div></div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--neon)" id="pw-rest">— W</div>
+      <div class="lc-meta">Estimation logicielle</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">
+      <div class="ct"><span>📈</span>HISTORIQUE</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-s pw-period active" data-period="24h" onclick="setPowerPeriod('24h')">24h</button>
+        <button class="btn-s pw-period" data-period="7d" onclick="setPowerPeriod('7d')">7 jours</button>
+        <button class="btn-s pw-period" data-period="30d" onclick="setPowerPeriod('30d')">30 jours</button>
+      </div>
+    </div>
+    <div id="pw-chart-wrap" style="width:100%;overflow-x:auto">
+      <svg id="pw-chart" viewBox="0 0 700 220" style="width:100%;height:220px" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="lc-meta" id="pw-period-summary" style="margin-top:8px">—</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ch"><div class="ct"><span>💶</span>TARIF ÉLECTRICITÉ</div></div>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+      Sert uniquement au calcul du coût affiché ci-dessus — aucune donnée envoyée nulle part,
+      tout reste sur ce serveur.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <div class="lc-meta">Prix du kWh (€)</div>
+        <input id="pw-price-input" type="number" step="0.001" min="0" style="background:var(--s2);border:1px solid var(--br);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;width:110px">
+      </div>
+      <div>
+        <div class="lc-meta">Fournisseur (repère perso, optionnel)</div>
+        <input id="pw-provider-input" type="text" maxlength="100" placeholder="EDF, TotalEnergies..." style="background:var(--s2);border:1px solid var(--br);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;width:180px">
+      </div>
+      <div>
+        <div class="lc-meta">Conserver l'historique (jours)</div>
+        <input id="pw-retention-input" type="number" step="1" min="7" max="365" style="background:var(--s2);border:1px solid var(--br);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;width:90px">
+      </div>
+      <button class="btn-s btn-go" onclick="savePowerSettings()">Enregistrer</button>
+    </div>
+    <div class="lc-meta" id="pw-settings-state" style="margin-top:8px">—</div>
+  </div>
+
+</main>
+</div><!-- /#p-power -->
+
+<!-- ═══ ADMIN PANEL ═══ -->
+<div class="panel" id="p-admin">
+
+  <!-- Login -->
+  <div id="adm-login">
+    <div class="login-box">
+      <div class="login-title">⚙️ Administration</div>
+      <div class="login-sub">Connectez-vous pour accéder au panneau</div>
+      <div class="lf-label">Identifiant</div>
+      <input class="lf-input" id="adm-user" type="text" placeholder="admin" autocomplete="username">
+      <div class="lf-label">Mot de passe</div>
+      <input class="lf-input" id="adm-pass" type="password" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="lf-btn" onclick="doLogin()">Connexion</button>
+      <div class="lf-err" id="lf-err"></div>
+    </div>
+  </div>
+
+  <!-- Content (hidden until auth) -->
+  <div id="adm-content" style="display:none">
+    <!-- Alerte mot de passe par défaut -->
+    <div id="adm-pw-alert" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);
+      border-radius:10px;padding:12px 18px;margin:0 0 14px;color:var(--red);font-size:13px;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">⚠️</span>
+      <span><strong>Mot de passe par défaut non changé !</strong>
+      Allez dans <strong>🔐 Paramètres</strong> pour le modifier dès maintenant.</span>
+    </div>
+    <div class="adm-head">
+      <div class="adm-title">Administration système</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="adm-user" id="adm-username">—</span>
+        <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- Sub-tabs -->
+    <div class="atabs">
+      <div class="atab active" data-s="svcs" onclick="aTab(this)">⚙️ Services</div>
+      <div class="atab" data-s="upd"  onclick="aTab(this)">🔄 Mises à jour</div>
+      <div class="atab" data-s="mdl"  onclick="aTab(this)">🧠 Modèles</div>
+      <div class="atab" data-s="logs" onclick="aTab(this)">📋 Logs</div>
+      <div class="atab" data-s="inst" onclick="aTab(this)">🚀 Installation</div>
+      <div class="atab" data-s="sys"  onclick="aTab(this)">🖥️ Système</div>
+      <div class="atab" data-s="set"  onclick="aTab(this)">🔐 Paramètres</div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="asect active" id="as-svcs">
+      <div class="svc-grid" id="adm-svc-grid"></div>
+    </div>
+
+    <!-- MISES À JOUR -->
+    <div class="asect" id="as-upd">
+      <div class="upd-row">
+        <div class="upd-ico">🦙</div>
+        <div class="upd-body"><div class="upd-name">Ollama</div><div class="upd-desc">Script officiel — dernière version stable</div></div>
+        <button class="btn-upd" onclick="doUpd('ollama',this)">Mettre à jour</button>
+      </div>
+      <div class="upd-row">
+        <div class="upd-ico">🐋</div>
+        <div class="upd-body"><div class="upd-name">Open WebUI</div><div class="upd-desc">Pull dernière image Docker + recréation container</div></div>
+        <button class="btn-upd" onclick="doUpd('webui',this)">Mettre à jour</button>
+      </div>
+      <div class="upd-row">
+        <div class="upd-ico">🐧</div>
+        <div class="upd-body"><div class="upd-name">Système</div><div class="upd-desc">apt / dnf / pacman — mise à jour complète</div></div>
+        <button class="btn-upd" onclick="doUpd('system',this)">Mettre à jour</button>
+      </div>
+      <div class="upd-out" id="upd-out"></div>
+    </div>
+
+    <!-- MODÈLES -->
+    <div class="asect" id="as-mdl">
+      <div class="acard">
+        <div class="acard-t">Télécharger un modèle</div>
+        <div class="model-pull">
+          <input class="mp-in" id="pull-nm" placeholder="llama3.2:3b · mistral · gemma2:9b · deepseek-r1:7b"
+            onkeydown="if(event.key==='Enter')doPull()">
+          <button class="btn-pull" onclick="doPull()">Pull</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">Téléchargement en arrière-plan — rafraîchissez dans quelques minutes.</div>
+      </div>
+      <div class="acard">
+        <div class="acard-t" style="display:flex;justify-content:space-between">
+          <span>Modèles installés</span>
+          <span id="mdl-count" style="color:var(--neon)"></span>
+        </div>
+        <div class="model-grid" id="mdl-grid"><div style="color:var(--muted);font-size:12px">Chargement…</div></div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="asect" id="as-logs">
+      <div class="acard">
+        <div class="log-bar">
+          <select class="log-sel" id="log-src" onchange="loadLogs()">
+            <option value="ollama">Ollama</option>
+            <option value="webui">Open WebUI</option>
+            <option value="docker">Docker</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="syslog">Syslog</option>
+            <option value="kernel">Kernel</option>
+          </select>
+          <select class="log-sel" style="width:80px" id="log-n" onchange="loadLogs()">
+            <option value="50">50</option><option value="100" selected>100</option>
+            <option value="200">200</option><option value="500">500</option>
+          </select>
+          <button class="btn-ref" onclick="loadLogs()">↻ Refresh</button>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--muted)">Auto 10s</span>
+        </div>
+        <div class="log-box" id="log-box"></div>
+      </div>
+    </div>
+
+    <!-- INSTALLATION -->
+    <div class="asect" id="as-inst">
+      <div class="acard" style="margin-bottom:16px">
+        <div class="acard-t">🚀 Lancer l'installation complète</div>
+        <p style="color:var(--muted);font-size:13px;margin:8px 0 16px">
+          Lance le script d'installation en arrière-plan. La progression s'affiche en temps réel dans le Tableau de bord.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn-upd" style="background:var(--neon);color:#000;font-weight:700;font-size:14px;padding:10px 24px"
+            onclick="doInstall()">🚀 Démarrer l'installation</button>
+          <button class="btn-upd" style="background:var(--purple);padding:10px 16px"
+            onclick="checkInstallStatus()">🔄 État</button>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:5px">
+            Chemin du script (si introuvable automatiquement) :
+          </div>
+          <div style="display:flex;gap:8px">
+            <input id="script-path-in" class="lf-input" style="flex:1;margin:0;font-size:11px"
+              placeholder="/root/install_ia_local.sh"
+              value="">
+            <button class="btn-s btn-go" style="padding:8px 14px;font-size:11px"
+              onclick="saveScriptPath()">Enregistrer</button>
+          </div>
+        </div>
+        <div id="inst-out" style="margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--neon);min-height:20px"></div>
+      </div>
+      <div class="acard" id="inst-progress-sec" style="display:none">
+        <div class="acard-t">📊 Progression en temps réel</div>
+        <div id="inst-progress" style="margin-top:10px;color:var(--muted);font-size:13px"></div>
+      </div>
+      <div class="acard" id="inst-log-sec" style="display:none">
+        <div class="acard-t">📋 Log d'installation</div>
+        <button class="btn-ref" onclick="loadInstallLog()" style="margin-bottom:8px">↻ Rafraîchir</button>
+        <pre id="inst-log" style="background:#0a0a0a;border:1px solid var(--border);border-radius:6px;
+          padding:12px;font-size:11px;color:#888;max-height:220px;overflow-y:auto;white-space:pre-wrap;margin:0"></pre>
+      </div>
+    </div>
+
+    <!-- SYSTÈME -->
+    <div class="asect" id="as-sys">
+      <div class="acard" style="margin-bottom:14px">
+        <div class="acard-t">🖥️ Contrôle de la machine</div>
+        <p style="color:var(--muted);font-size:12px;margin:6px 0 14px">
+          Actions système — confirmation demandée avant exécution.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-upd" style="background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.3);padding:10px 18px"
+            onclick="sysDo('reboot')">🔄 Redémarrer</button>
+          <button class="btn-upd" style="background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3);padding:10px 18px"
+            onclick="sysDo('shutdown')">⏻ Éteindre</button>
+          <button class="btn-upd" style="background:rgba(77,159,255,.1);color:var(--blue);border:1px solid rgba(77,159,255,.3);padding:10px 18px"
+            onclick="sysDo('update_system')">📦 Mettre à jour le système</button>
+        </div>
+        <div id="sys-result" style="margin-top:12px;font-size:13px;font-family:var(--mono);color:var(--neon);min-height:18px"></div>
+      </div>
+      <div class="acard">
+        <div class="acard-t">ℹ️ Informations système</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px" id="adm-sysinfo2"></div>
+      </div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="asect" id="as-set">
+      <div class="acard">
+        <div class="acard-t">Changer les identifiants</div>
+        <div class="sfield"><div class="sf-label">Utilisateur</div><input class="sf-in" id="new-user" type="text" placeholder="admin"></div>
+        <div class="sfield"><div class="sf-label">Mot de passe actuel</div><input class="sf-in" id="old-pw" type="password" placeholder="••••••••"></div>
+        <div class="sfield"><div class="sf-label">Nouveau mdp</div><input class="sf-in" id="new-pw" type="password" placeholder="6 caractères minimum"></div>
+        <div class="sfield"><div class="sf-label">Confirmation</div><input class="sf-in" id="conf-pw" type="password" placeholder="Répéter"></div>
+        <button class="btn-save" onclick="changePw()">Enregistrer</button>
+      </div>
+    </div>
+  </div><!-- /#adm-content -->
+</div><!-- /#p-admin -->
+
+<footer>Momory - IA Local · Port <strong>__PORT__</strong> · Stats 2s · <span id="ft">—</span></footer>
+<div id="toast"></div>
+
+<script src="/static/app.js"></script>
+</body></html>
