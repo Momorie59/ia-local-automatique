@@ -125,6 +125,21 @@ Autres commandes : `momory doctor` (diagnostic), `momory models` (modèles dispo
 
 ---
 
+## 📱 Application Android
+
+Dépôt séparé : **[github.com/Momorie59/MomoryAndroid](https://github.com/Momorie59/MomoryAndroid)**
+
+Un `Momory.apk` prêt à installer y est disponible directement — pas besoin de compiler
+avec Android Studio. Télécharge-le sur ton téléphone et installe-le (autorise
+"sources inconnues" si Android le demande).
+
+L'app permet de discuter avec ton IA en texte **ou entièrement à la voix** (tu parles,
+elle transcrit, répond, et te lit sa réponse à voix haute), avec la même configuration
+automatique que le CLI : entre juste l'IP de ton serveur, le reste se récupère tout seul
+depuis le dashboard.
+
+---
+
 ## 📂 Structure du projet
 
 ```
