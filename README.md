@@ -45,6 +45,12 @@ cd momory-ia-local
 chmod +x Momory-ia_local_v9.sh
 sudo bash Momory-ia_local_v9.sh
 ```
+ou
+```bash
+git clone https://github.com/Momorie59/ia-local-automatique.git
+cd ia-local-automatique
+sudo bash Momory-ia_local_v9.sh
+```
 
 *(`curl -LO ...` fonctionne aussi si `wget` n'est pas installé.)*
 
