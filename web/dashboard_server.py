@@ -675,6 +675,9 @@ def api_update(body):
         return {"ok":r["ok"],"msg":r["out"] or r["err"]}
     return {"ok":False,"msg":"Cible inconnue"}
 
+_PULL_PROCS = {}   # nom_modèle -> subprocess.Popen (pour vérifier le statut réel)
+PULL_LOG_FILE = "/var/lib/ia-installer/model-pull.log"
+
 def api_models(body):
     act=body.get("action","list")
     if act=="list":
@@ -685,8 +688,34 @@ def api_models(body):
     if act=="pull":
         nm=body.get("name","").strip()
         if not nm or not re.match(r'^[\w./:+-]+$',nm): return {"ok":False,"msg":"Nom invalide"}
-        subprocess.Popen(["ollama","pull",nm],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        try:
+            Path(PULL_LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+            logf = open(PULL_LOG_FILE, "a")
+            logf.write(f"\n--- pull {nm} @ {time.strftime('%H:%M:%S')} ---\n")
+            logf.flush()
+            proc = subprocess.Popen(["ollama","pull",nm], stdout=logf, stderr=subprocess.STDOUT)
+            _PULL_PROCS[nm] = proc
+        except Exception as e:
+            return {"ok":False,"msg":f"Impossible de lancer le téléchargement : {e}"}
         return {"ok":True,"msg":f"Téléchargement de {nm} lancé…"}
+    if act=="pull_status":
+        # Le frontend interroge ça pour savoir quand rafraîchir la liste, et
+        # afficher une vraie erreur si le pull a échoué (au lieu du silence
+        # d'avant, où un échec passait totalement inaperçu).
+        nm=body.get("name","").strip()
+        proc = _PULL_PROCS.get(nm)
+        if proc is None:
+            return {"ok":True,"status":"unknown"}
+        code = proc.poll()
+        if code is None:
+            return {"ok":True,"status":"running"}
+        del _PULL_PROCS[nm]
+        if code == 0:
+            return {"ok":True,"status":"done"}
+        tail=""
+        try: tail="\n".join(Path(PULL_LOG_FILE).read_text().splitlines()[-15:])
+        except Exception: pass
+        return {"ok":True,"status":"failed","detail":tail}
     if act=="delete":
         nm=body.get("name","").strip()
         if not nm or not re.match(r'^[\w./:+-]+$',nm): return {"ok":False,"msg":"Nom invalide"}

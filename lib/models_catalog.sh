@@ -5,6 +5,58 @@
 #  SECTION 3 : CATALOGUE & SÉLECTION DES MODÈLES
 # ================================================================
 
+# Vérifie chaque modèle du catalogue contre le vrai registre Ollama
+# (registry.ollama.ai) — évite de proposer un tag qui n'existe pas
+# (ex: "mistral:12b", qui n'a jamais existé — le vrai nom est
+# "mistral-nemo:12b"). Résultat mis en cache 7 jours pour ne pas
+# ralentir le menu à chaque ouverture avec ~50 requêtes réseau.
+declare -gA _CATALOG_VALID=()
+
+_validate_catalog() {
+  local -n _catalog_ref=$1
+  local cache_file="${IA_STATE_DIR:-/var/lib/ia-installer}/model-catalog-validated.cache"
+  local now; now=$(date +%s)
+  local cache_ts=0
+
+  [ -f "$cache_file" ] && cache_ts=$(head -1 "$cache_file" 2>/dev/null | grep -oE '^[0-9]+' || echo 0)
+  local cache_age=$(( now - cache_ts ))
+
+  if [ -f "$cache_file" ] && [ "$cache_age" -lt 604800 ]; then
+    while IFS=' ' read -r NAME STATUS; do
+      [ "$NAME" = "$cache_ts" ] && continue   # ligne d'horodatage
+      _CATALOG_VALID["$NAME"]="$STATUS"
+    done < <(tail -n +2 "$cache_file")
+    return 0
+  fi
+
+  if ! command -v curl &>/dev/null; then
+    return 0   # pas de curl disponible — on affiche tout sans filtrer
+  fi
+
+  info "Vérification du catalogue contre le registre Ollama (une fois par semaine, ~30s)..."
+  {
+    echo "$now"
+    for ENTRY in "${_catalog_ref[@]}"; do
+      [[ "$ENTRY" =~ ^(.*):([^:]+):([^:]+):([^:]+):([^:]+):([^:]+)$ ]] || continue
+      local NAME="${BASH_REMATCH[1]}"
+      local MODEL_PART="${NAME%%:*}"
+      local TAG_PART="latest"
+      [[ "$NAME" == *:* ]] && TAG_PART="${NAME#*:}"
+      local CODE
+      CODE=$(curl -s -o /dev/null -m 3 -w "%{http_code}" \
+        "https://registry.ollama.ai/v2/library/${MODEL_PART}/manifests/${TAG_PART}" 2>/dev/null)
+      if [ "$CODE" = "200" ]; then
+        echo "$NAME OK"
+        _CATALOG_VALID["$NAME"]="OK"
+      else
+        echo "$NAME INVALID"
+        _CATALOG_VALID["$NAME"]="INVALID"
+      fi
+    done
+  } > "$cache_file" 2>/dev/null
+  ok "Catalogue vérifié."
+}
+
 select_models_smart() {
   title "SÉLECTION INTELLIGENTE DES MODÈLES"
 
@@ -82,7 +134,6 @@ select_models_smart() {
     "llama3.1:13b:9:18:general:Llama 3.1 13B — très bon:8"
     "llama3.3:13b:9:18:general:Llama 3.3 13B — Meta 2025:9"
     "phi4:14b:9:18:general:Phi-4 14B — Microsoft excellence:10"
-    "mistral:12b:8:16:general:Mistral 12B — excellent FR:9"
     "gemma3:12b:8:16:general:Gemma3 12B — polyvalent Google:9"
     "codestral:22b:14:24:code:Mistral Codestral — code professionnel:10"
     # ── Grands modèles (20-45 Go VRAM / 32-64 Go RAM) ────────────────────────
@@ -102,6 +153,8 @@ select_models_smart() {
   declare -ga COMPATIBLE_MODELS=()
   declare -ga AUTO_SUGGEST=("nomic-embed-text")
   declare -gA MODEL_TO_IDX_MAP=() # Nouvelle map pour nom de modèle -> index
+
+  _validate_catalog CATALOG
 
   echo -e "${CYAN}  Mémoire effective : ${BOLD}${EFFECTIVE} Go${NC}"
   echo -e "${CYAN}  Profil matériel   : ${BOLD}${PROFILE}${NC}"
@@ -128,6 +181,10 @@ select_models_smart() {
       warn "Format de l'entrée du catalogue inattendu: $ENTRY"
       continue # Passe à l'entrée suivante si le format est incorrect
     fi
+
+    # Modèle vérifié inexistant sur le registre (cache) — on ne le propose
+    # jamais, plutôt que de laisser l'utilisateur tomber sur un échec au pull.
+    [ "${_CATALOG_VALID[$NAME]:-OK}" = "INVALID" ] && continue
 
     if [ "$VRAM_NEED" -le "$EFFECTIVE" ] || [ "$RAM_NEED" -le "$RAM" ]; then
       COMPATIBLE_MODELS+=("$NAME")
@@ -160,6 +217,7 @@ select_models_smart() {
     else
       continue # Passe à l'entrée suivante si le format est incorrect
     fi
+    [ "${_CATALOG_VALID[$NAME]:-OK}" = "INVALID" ] && continue
     if [ "$VRAM_NEED" -gt "$EFFECTIVE" ] && [ "$RAM_NEED" -gt "$RAM" ]; then
       printf "  ${DIM}  [--] %-26s  %dGo requis — %s${NC}\n" "$NAME" "$VRAM_NEED" "$DESC"
     fi

@@ -603,10 +603,46 @@ async function loadModels(){
 
 async function doPull(){
   const nm=document.getElementById('pull-nm').value.trim();if(!nm)return;
-  toast(`Pull ${nm} lancé…`,'inf');
+  const btn=document.getElementById('pull-btn');
+  const input=document.getElementById('pull-nm');
+  toast(`Téléchargement de ${nm} lancé…`,'inf');
   const d=await _aapi('/api/admin/models',{action:'pull',name:nm});
-  toast(d?.msg||(d?.ok?'OK':'Erreur'),d?.ok?'ok':'err');
-  document.getElementById('pull-nm').value='';
+  if(!d?.ok){ toast(d?.msg||'Erreur','err'); return; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ En cours…'; }
+  if(input) input.disabled=true;
+
+  // On interroge le vrai statut du téléchargement au lieu de considérer
+  // "lancé" comme "terminé" — la liste ne se rafraîchissait jamais avant,
+  // et un échec (mauvais nom, réseau) passait totalement inaperçu.
+  const started=Date.now();
+  const maxWaitMs=20*60*1000;   // 20 min — large pour les gros modèles
+  const poll=async()=>{
+    if(Date.now()-started > maxWaitMs){
+      toast(`${nm} : toujours en cours après 20 min — vérifie manuellement plus tard`,'err');
+      resetPullUI(); return;
+    }
+    const s=await _aapi('/api/admin/models',{action:'pull_status',name:nm});
+    if(s?.status==='running' || s?.status==='unknown'){
+      setTimeout(poll, 4000);
+      return;
+    }
+    if(s?.status==='done'){
+      toast(`✓ ${nm} installé`,'ok');
+      document.getElementById('pull-nm').value='';
+      loadModels();
+    } else {
+      toast(`✗ Échec du téléchargement de ${nm}`,'err');
+      if(s?.detail) console.warn('Détail échec pull:', s.detail);
+    }
+    resetPullUI();
+  };
+  setTimeout(poll, 3000);   // laisse le process démarrer avant le 1er check
+}
+function resetPullUI(){
+  const btn=document.getElementById('pull-btn');
+  const input=document.getElementById('pull-nm');
+  if(btn){ btn.disabled=false; btn.textContent='Pull'; }
+  if(input) input.disabled=false;
 }
 
 async function delMdl(nm,btn){

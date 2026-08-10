@@ -445,9 +445,15 @@ progress_ollama_pull() {
       printf "\r  Pull %-25s [%b] %3d%%" "$MODEL" "$BAR" "$PCT"
     fi
   done
+  # $? après un pipeline reflète la DERNIÈRE commande (le while, qui réussit
+  # quasi toujours), pas "ollama pull" lui-même — sans PIPESTATUS[0], un
+  # pull qui échoue (mauvais nom, réseau, disque plein) était rapporté comme
+  # un succès à chaque fois, en installation comme dans le menu "Ajouter".
+  local PULL_STATUS=${PIPESTATUS[0]}
   PROGRESS_SUBSTEP_LABEL=""; PROGRESS_SUBSTEP_PCT=0
   progress_write_json "${CURRENT_STEP:-}" "${PLAN_DESC[${CURRENT_STEP:-}]:-}"
   echo ""
+  return "$PULL_STATUS"
 }
 
 progress_docker_pull() {
