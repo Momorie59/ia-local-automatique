@@ -164,11 +164,96 @@ momory-cli/              Assistant IA en ligne de commande (TypeScript/Node)
 Ubuntu · Pop!_OS · Debian · Fedora · Arch · openSUSE · Void · Alpine — toute distro
 Linux x86_64/arm64. GPU NVIDIA (CUDA), AMD (ROCm), ou CPU.
 
+## 🛠️ Commandes utiles
+
+### Menu principal du script
+
+Une fois installé, relance simplement `sudo bash Momory-ia_local_v9.sh` (ou le lien créé
+dans ton `$HOME` : `sudo bash ~/Momory-ia_local_v9.sh`) pour retrouver ce menu :
+
+| Touche | Action |
+|---|---|
+| `1` | Installation complète |
+| `2` | Gérer les modèles IA |
+| `3` | Vérifier & appliquer les mises à jour |
+| `4` | Réinstaller un composant (drivers, Docker, Ollama, WebUI, Dashboard, Qdrant) |
+| `5` | État du système |
+| `6` | Nettoyage complet (clean install) |
+| `7` | Réparer Open WebUI ← si conversations perdues ou modèles inaccessibles |
+| `8` | Voir les logs |
+| `s` | Stats système en temps réel (CPU · RAM · GPU · Services · Réseau) |
+| `d` | Ouvrir/relancer le dashboard web |
+| `0` | Effacer l'état d'erreur ← si tout fonctionne mais une erreur reste affichée |
+| `9` | Quitter |
+
+### Services (systemd)
+
+```bash
+# État / logs
+sudo systemctl status ollama
+sudo systemctl status ia-dashboard
+sudo journalctl -u ollama -n 50 --no-pager
+
+# Redémarrer
+sudo systemctl restart ollama
+sudo systemctl restart ia-dashboard
+
+# Conteneurs Docker (Open WebUI, Qdrant)
+docker ps
+docker logs open-webui
+docker restart open-webui
+docker logs qdrant
+docker restart qdrant
+```
+
+### Ollama
+
+```bash
+ollama list                 # modèles installés
+ollama pull <modèle>        # télécharger un modèle
+ollama rm <modèle>          # supprimer un modèle
+ollama ps                   # modèles actuellement chargés en mémoire
+```
+
+### Logs du script
+
+```bash
+sudo tail -80 /var/log/ia-installer/install-latest.log
+sudo grep -n "ERR\|error\|introuvable" /var/log/ia-installer/install-latest.log
+```
+
+### Momory CLI
+
+```bash
+momory                      # lancer l'assistant (chat + fichiers + vocal via l'app Android)
+momory doctor                # diagnostic (config, serveur, modèles)
+momory models                 # modèles disponibles sur le serveur
+momory config --auto <ip>      # config automatique depuis le dashboard
+momory config --setup           # configuration manuelle
+```
+
 ## 🔒 Sécurité
 
 Aucun accès système sans confirmation explicite. Chaque action sensible (installation,
 modification de fichier, suppression) est affichée avant d'être appliquée — en terminal
 et dans le dashboard web, où tu peux valider Oui/Non à distance.
+
+Identifiants par défaut du dashboard (onglet ⚙️ Administration) : `admin` /
+`ia-local-admin` — **à changer dès la première connexion**, ce mot de passe par défaut
+est visible dans le code source.
+
+## 🆘 Dépannage
+
+**Mot de passe du dashboard oublié** — pas besoin de le retrouver, il suffit de
+réinitialiser aux identifiants par défaut directement sur le serveur :
+
+```bash
+sudo rm /var/lib/ia-installer/admin-credentials
+sudo systemctl restart ia-dashboard
+```
+
+Reconnecte-toi avec `admin` / `ia-local-admin`, puis change-le immédiatement dans
+l'onglet Administration → Sécurité.
 
 ## 📜 Licence
 
