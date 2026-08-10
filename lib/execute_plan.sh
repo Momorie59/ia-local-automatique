@@ -285,6 +285,11 @@ execute_step() {
 # S'assurer qu'Ollama attend le réseau (pour download de modèles)
 After=network-online.target
 Wants=network-online.target
+# S'assurer qu'Ollama attend que le disque de données soit VRAIMENT monté
+# (pas juste "tenté") avant de démarrer — sinon, au boot, le service peut
+# démarrer avant le montage effectif et planter en boucle avec une erreur
+# "permission denied" sur un répertoire de point de montage vide non monté.
+RequiresMountsFor=${CFG[ollama_dir]}
 
 [Service]
 Environment="OLLAMA_MODELS=${CFG[ollama_dir]}"
@@ -473,6 +478,7 @@ CFGEOF
 [Unit]
 Description=llama.cpp serveur HTTP
 After=network.target
+RequiresMountsFor=${LLAMA_MODELS_DIR}
 [Service]
 Type=simple
 User=root

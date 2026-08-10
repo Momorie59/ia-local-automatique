@@ -13,7 +13,7 @@ Gemini CLI / Claude Code, connecté à ton serveur, pas à un cloud.
 [![Bash](https://img.shields.io/badge/bash-5.x-4EAA25?logo=gnubash&logoColor=white)](.)
 [![Python](https://img.shields.io/badge/python-3-3776AB?logo=python&logoColor=white)](.)
 [![TypeScript](https://img.shields.io/badge/node-%3E%3D18-339933?logo=nodedotjs&logoColor=white)](.)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE.md)
 
 </div>
 
@@ -30,6 +30,7 @@ Gemini CLI / Claude Code, connecté à ton serveur, pas à un cloud.
 | ⚡ **Suivi énergie** | Consommation instantanée (mesure réelle CPU/GPU, estimée pour le reste), historique 24h/7j/30j, coût en € selon ton tarif |
 | 📝 **Notes intégrées** | Bloc-notes du dashboard avec corbeille (suppression récupérable, vidage explicite) |
 | 🤖 **Momory CLI** | Assistant IA en ligne de commande — discute, lit/écrit/supprime/télécharge des fichiers dans ton projet, avec confirmation systématique |
+| 📱 **Momory Android** | App mobile (chat + vocal complet) pour parler à ton IA depuis ton téléphone — [dépôt séparé](https://github.com/Momorie59/MomoryAndroid), APK prêt à installer |
 | 🔁 **Reprise automatique** | Coupure de courant, reboot, erreur réseau — l'installation reprend là où elle s'est arrêtée |
 
 ---
