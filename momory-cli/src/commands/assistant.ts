@@ -85,13 +85,13 @@ export async function runAssistant(cfg: MomoryConfig): Promise<void> {
   );
   console.log(chalk.dim(`Répertoire : ${process.cwd()}`));
 
-  // Vérification rapide (non bloquante si le serveur ne répond pas) : la
-  // config du serveur a-t-elle changé depuis la dernière config locale ?
+  // Vérification rapide (non bloquante si le serveur ne répond pas) : des
+  // mises à jour de modèle (ou de config) sont-elles disponibles sur le serveur ?
   try {
     const serverInfo = await fetchServerMomoryInfo(cfg.server.host, 1500);
     const diffs = configDrift(cfg, serverInfo);
     if (diffs.length > 0) {
-      console.log(chalk.yellow("\n⚠ Le serveur a changé depuis ta dernière configuration :"));
+      console.log(chalk.yellow("\n💡 Des mises à jour de modèle IA sont disponibles sur le serveur :"));
       for (const d of diffs) console.log(chalk.yellow(`  • ${d}`));
       console.log(chalk.dim(`  → Pour mettre à jour : momory config --auto ${cfg.server.host}\n`));
     }

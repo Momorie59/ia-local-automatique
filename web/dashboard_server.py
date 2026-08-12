@@ -493,11 +493,22 @@ def get_lan_ip():
     except:
         return socket.gethostbyname(socket.gethostname())
 
+def _model_size_b(name):
+    """Extrait la taille en milliards de paramètres depuis un tag Ollama
+    (ex: 'qwen2.5-coder:7b' -> 7.0, 'phi4-mini' sans tag -> 0). Sert à
+    choisir le modèle le PLUS CAPABLE parmi plusieurs candidats, plutôt
+    que le premier de la liste (qui est trié par date de modification —
+    un petit modèle re-pull récemment passerait sinon devant un plus gros)."""
+    m = re.search(r':(\d+(?:\.\d+)?)b\b', name.lower())
+    return float(m.group(1)) if m else 0.0
+
 def get_momory_info(ollama_models):
     """Valeurs prêtes à coller dans `momory config --setup` sur une autre machine."""
     cfg=_cfg()
-    chat=next((m for m in ollama_models if any(k in m.lower() for k in ("llama","mistral","gemma"))), None)
-    coder=next((m for m in ollama_models if "code" in m.lower()), None)
+    chat_candidates = [m for m in ollama_models if any(k in m.lower() for k in ("llama","mistral","gemma"))]
+    coder_candidates = [m for m in ollama_models if "code" in m.lower()]
+    chat = max(chat_candidates, key=_model_size_b) if chat_candidates else None
+    coder = max(coder_candidates, key=_model_size_b) if coder_candidates else None
     info={
         "host": get_lan_ip(),
         "port": 11434,

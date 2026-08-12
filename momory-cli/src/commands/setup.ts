@@ -7,7 +7,7 @@ import {
   loadConfig,
   saveConfig,
 } from "../config.js";
-import { pingServer } from "../ollama.js";
+import { listModels, pingServer } from "../ollama.js";
 import { fetchServerMomoryInfo, serverInfoToConfig } from "../serverConfig.js";
 
 /**
@@ -52,7 +52,7 @@ export async function runSetupWizard(): Promise<MomoryConfig> {
 
   console.log("Configuration du serveur IA :\n");
 
-  const answers = await prompts(
+  const { host, port } = await prompts(
     [
       {
         type: "text",
@@ -66,14 +66,72 @@ export async function runSetupWizard(): Promise<MomoryConfig> {
         message: "Port",
         initial: DEFAULT_CONFIG.server.port,
       },
+    ],
+    { onCancel: () => process.exit(1) }
+  );
+
+  // On tente de lister les modèles réellement présents sur le serveur pour
+  // proposer un vrai choix (groupé par type) plutôt qu'une saisie à
+  // l'aveugle — avec repli sur du texte libre si le serveur ne répond pas.
+  let chatModel = "", coderModel = "";
+  console.log(chalk.dim("\nRecherche des modèles disponibles sur le serveur…"));
+  let modelNames: string[] = [];
+  try {
+    const models = await listModels({ server: { host, port } } as MomoryConfig);
+    modelNames = models.map((m) => m.name);
+  } catch {
+    // silencieux — on bascule sur la saisie libre juste après
+  }
+
+  if (modelNames.length > 0) {
+    const isCoder = (m: string) => /code/i.test(m);
+    const isEmbed = (m: string) => /embed/i.test(m);
+    const coderModels = modelNames.filter((m) => isCoder(m) && !isEmbed(m));
+    const chatModels = modelNames.filter((m) => !isCoder(m) && !isEmbed(m));
+    const otherModels = modelNames.filter((m) => isEmbed(m));
+
+    const toChoices = (list: string[]) => [
+      ...list.map((m) => ({ title: m, value: m })),
+      { title: "— Autre (saisie manuelle) —", value: "__manual__" },
+    ];
+
+    const chatChoices = chatModels.length ? toChoices([...chatModels, ...otherModels]) : toChoices(modelNames);
+    const { chatPick } = await prompts(
       {
-        type: "text",
+        type: "select",
+        name: "chatPick",
+        message: "Modèle principal (conversation)",
+        choices: chatChoices,
+      },
+      { onCancel: () => process.exit(1) }
+    );
+    chatModel = chatPick === "__manual__" ? "" : chatPick;
+
+    const coderChoices = coderModels.length ? toChoices(coderModels) : toChoices(modelNames);
+    const { coderPick } = await prompts(
+      {
+        type: "select",
+        name: "coderPick",
+        message: "Modèle développement (momory code)",
+        choices: coderChoices,
+      },
+      { onCancel: () => process.exit(1) }
+    );
+    coderModel = coderPick === "__manual__" ? "" : coderPick;
+  } else {
+    console.log(chalk.yellow("⚠ Aucun modèle trouvé (serveur injoignable, ou aucun modèle installé) — saisie manuelle."));
+  }
+
+  const answers = await prompts(
+    [
+      {
+        type: chatModel ? null : "text",
         name: "chatModel",
         message: "Modèle principal (conversation)",
         initial: DEFAULT_CONFIG.models.chat,
       },
       {
-        type: "text",
+        type: coderModel ? null : "text",
         name: "coderModel",
         message: "Modèle développement (momory code)",
         initial: DEFAULT_CONFIG.models.coder,
@@ -88,7 +146,7 @@ export async function runSetupWizard(): Promise<MomoryConfig> {
         type: (prev) => (prev ? "text" : null),
         name: "qdrantHost",
         message: "Adresse Qdrant",
-        initial: (_prev, values) => values.host,
+        initial: () => host,
       },
       {
         type: (_prev, values) => (values.memoryEnabled ? "number" : null),
@@ -106,10 +164,10 @@ export async function runSetupWizard(): Promise<MomoryConfig> {
   );
 
   const cfg: MomoryConfig = {
-    server: { host: answers.host, port: answers.port },
+    server: { host, port },
     models: {
-      chat: answers.chatModel,
-      coder: answers.coderModel,
+      chat: chatModel || answers.chatModel,
+      coder: coderModel || answers.coderModel,
       embed: DEFAULT_CONFIG.models.embed,
     },
     memory: {
