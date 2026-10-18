@@ -1,3 +1,8 @@
+# Changelog
+
+## Compatibilité avec le serveur d'images d'EVA (docs uniquement)
+- README : section « Images avec EVA » — `eva-imagegen` (dépôt EVA) s'installe à côté d'Ollama et d'Open WebUI sans modifier cette installation (réseau hôte, service systemd, port 7860, disque de données lu dans `config.env`, carte partagée avec Ollama). Aucun changement de code ici.
+
 # Changelog V8 → V9
 
 ## Refonte structurelle

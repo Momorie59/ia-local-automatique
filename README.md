@@ -31,6 +31,7 @@ Gemini CLI / Claude Code, connecté à ton serveur, pas à un cloud.
 | 📝 **Notes intégrées** | Bloc-notes du dashboard avec corbeille (suppression récupérable, vidage explicite) |
 | 🤖 **Momory CLI** | Assistant IA en ligne de commande — discute, lit/écrit/supprime/télécharge des fichiers dans ton projet, avec confirmation systématique |
 | 📱 **Momory Android** | App mobile (chat + vocal complet) pour parler à ton IA depuis ton téléphone — [dépôt séparé](https://github.com/Momorie59/MomoryAndroid), APK prêt à installer |
+| 🎨 **Images avec EVA** | Compagnon facultatif : le serveur d'images d'[EVA](https://github.com/Momorie59/EVA) (`eva-imagegen`, Stable Diffusion sur ta carte NVIDIA) s'installe à côté d'Ollama sans rien modifier de ton installation — voir [Images avec EVA](#-images-avec-eva) |
 | 🔁 **Reprise automatique** | Coupure de courant, reboot, erreur réseau — l'installation reprend là où elle s'est arrêtée |
 
 ---
@@ -231,6 +232,21 @@ momory models                 # modèles disponibles sur le serveur
 momory config --auto <ip>      # config automatique depuis le dashboard
 momory config --setup           # configuration manuelle
 ```
+
+## 🎨 Images avec EVA
+
+Le projet [EVA](https://github.com/Momorie59/EVA) (assistant local sur NAS) peut dessiner et retoucher des images grâce à un petit serveur Docker, `eva-imagegen`, à installer sur **ce** serveur IA. Il est **indépendant** de cet installateur : il ne touche ni Ollama, ni Open WebUI, ni Qdrant.
+
+- Il lit `/var/lib/ia-installer/config.env` pour ranger ses modèles sur ton disque de données, comme Open WebUI.
+- Conteneur Docker en réseau hôte (joint Ollama en `127.0.0.1:11434`), service systemd `eva-imagegen.service` lancé après Docker et Ollama, port `7860`, règle `ufw` limitée au réseau local.
+- La carte graphique est **partagée avec Ollama** : le serveur décharge les modèles d'Ollama avant de dessiner, puis libère la carte au repos.
+- Prérequis NVIDIA : pilote ≥ 525 et NVIDIA Container Toolkit (l'installateur d'EVA le vérifie et propose de l'installer depuis le dépôt officiel NVIDIA, le même que celui de ce projet).
+- Installation : copie le dossier `eva-imagegen/` du dépôt EVA sur le serveur, puis `sudo bash install-imagegen.sh` (`--dry-run` pour un aperçu). Il affiche un jeton à coller dans EVA ; ensuite les modèles et les mises à jour se gèrent depuis EVA.
+- Open WebUI peut aussi utiliser ce serveur : Admin › Paramètres › Images › moteur *AUTOMATIC1111* → `http://127.0.0.1:7860`.
+
+Détails et dépannage : `IMAGES.md` dans le dépôt EVA.
+
+---
 
 ## 🔒 Sécurité
 
